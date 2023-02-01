@@ -1,4 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Post } from '@nestjs/common/decorators';
+import { ParseIntPipe } from '@nestjs/common/pipes';
 import { AppService } from './app.service';
 
 @Controller()
@@ -10,9 +12,22 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get("first-api")
+  @Get('first-api')
   firstApi() {
-    return "My first api."
+    return 'My first api.';
   }
 
+  @Get('redis')
+  getRedisValue(@Query('key') key: string) {
+    return this.appService.getRedisSomeValue(key);
+  }
+
+  @Post('redis')
+  setRedisValue(
+    @Body('key') key: string,
+    @Body('value') value: string,
+    @Body('ex', ParseIntPipe) ex: number,
+  ) {
+    return this.appService.setRedisSomeValue(key, value, ex)
+  }
 }
