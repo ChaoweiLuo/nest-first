@@ -1,48 +1,38 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Book } from './book.schema';
+import { Book, BookDocument } from './book.schema';
 import { randomUUID } from 'crypto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class BookService {
-
   private readonly books: Array<Book>;
 
-  constructor() {
+  constructor(@InjectModel(Book.name) private bookModel: Model<BookDocument>) {
     this.books = [];
   }
 
   createBook({ name, price }: Omit<Book, 'id'>) {
-    const book = new Book();
-    book.id = randomUUID();
-    book.name = name;
-    book.price = price;
-    this.books.push(book);
-    return book;
+    return this.bookModel.create({
+      _id: randomUUID(),
+      name,
+      price
+    });
   }
 
   editBook(id: string, { name, price }: Omit<Book, 'id'>) {
-    const book = this.books.find(b => b.id === id);
-    if(!book) throw new NotFoundException();
-    book.name = name;
-    book.price = price;
+    return this.bookModel.findByIdAndUpdate(id, { $set: { name, price } })
   }
 
   deleteBook(id: string) {
-    const index = this.books.findIndex(b => b.id === id);
-    if(index<0) throw new NotFoundException();
-    const [book] = this.books.splice(index, 1);
-    return book;
+    return this.bookModel.findByIdAndDelete(id);
   }
 
   listBooks() {
-    return this.books;
+    return this.bookModel.find();
   }
 
   findBook(id: string) {
-    const book = this.books.find(b => b.id === id);
-    if(!book) throw new NotFoundException();
-    return book;
+    return this.bookModel.findById(id);
   }
-
-
 }
