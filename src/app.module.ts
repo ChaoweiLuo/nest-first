@@ -11,6 +11,7 @@ import { MysqlModule } from './mysql/mysql.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule/dist';
 import { MulterModule } from '@nestjs/platform-express/multer';
+import { FileController } from './file.controller';
 
 @Module({
   imports: [
@@ -45,7 +46,7 @@ import { MulterModule } from '@nestjs/platform-express/multer';
     MysqlModule,
     ScheduleModule.forRoot(),
   ],
-  controllers: [AppController, BookController],
+  controllers: [AppController, BookController, FileController],
   providers: [AppService, BookService, RedisService],
 })
 export class AppModule {}
