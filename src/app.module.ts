@@ -10,10 +10,18 @@ import { RedisService } from './redis.service';
 import { MysqlModule } from './mysql/mysql.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule/dist';
+import { MulterModule } from '@nestjs/platform-express/multer';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    MulterModule.registerAsync({
+      inject: [ConfigService],
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        dest: configService.get("FILE_DEST")
+      }),
+    }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       imports: [ConfigModule],
@@ -28,11 +36,11 @@ import { ScheduleModule } from '@nestjs/schedule/dist';
       useFactory: async (configService: ConfigService) => {
         return {
           type: 'mysql',
-          url: configService.get("MYSQL_URL"),
-          entities: ["dist/**/*.entity{.ts,.js}"],
+          url: configService.get('MYSQL_URL'),
+          entities: ['dist/**/*.entity{.ts,.js}'],
           synchronize: true,
-        }
-      }
+        };
+      },
     }),
     MysqlModule,
     ScheduleModule.forRoot(),
