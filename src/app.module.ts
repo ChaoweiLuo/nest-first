@@ -9,6 +9,7 @@ import { BookService } from './book/book.service';
 import { RedisService } from './redis.service';
 import { MysqlModule } from './mysql/mysql.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule/dist';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }
     }),
     MysqlModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController, BookController],
   providers: [AppService, BookService, RedisService],

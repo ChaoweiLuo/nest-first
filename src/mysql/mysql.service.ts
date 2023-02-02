@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+import { CronExpression } from '@nestjs/schedule/dist';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMysqlDto } from './dto/create-mysql.dto';
@@ -11,6 +13,11 @@ export class MysqlService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  sqlJob() {
+    console.log('sqlJob Running.', new Date());
+  }
 
   create(createMysqlDto: CreateMysqlDto) {
     const user = this.usersRepository.create(createMysqlDto);

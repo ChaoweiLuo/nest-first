@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { RedisService } from './redis.service';
 
 @Injectable()
@@ -8,6 +9,11 @@ export class AppService {
     private readonly configService: ConfigService,
     private readonly redisService: RedisService,
   ) {}
+
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  appJob() {
+    console.log('appJob Running.', new Date());
+  }
 
   getHello(): string {
     return this.configService.get<string>('APP_NAME');
