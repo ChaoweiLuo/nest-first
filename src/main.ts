@@ -2,6 +2,8 @@ import { ConfigService } from '@nestjs/config/dist';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +19,17 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const port = configService.get<string>('PORT');
+
+  app.use(cookieParser());
+  // somewhere in your initialization file
+  app.use(
+    session({
+      secret: configService.get('SESSION_SECRET', 'nest-first'),
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+
   await app.listen(port || 3001);
 }
 bootstrap();
