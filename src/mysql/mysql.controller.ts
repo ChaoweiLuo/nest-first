@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MysqlService } from './mysql.service';
 import { CreateMysqlDto } from './dto/create-mysql.dto';
 import { UpdateMysqlDto } from './dto/update-mysql.dto';
@@ -8,6 +8,7 @@ export class MysqlController {
   constructor(private readonly mysqlService: MysqlService) {}
 
   @Post()
+  // @UsePipes(new ValidationPipe())
   create(@Body() createMysqlDto: CreateMysqlDto) {
     return this.mysqlService.create(createMysqlDto);
   }
