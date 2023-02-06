@@ -21,16 +21,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.enableCors();
-  app.use(csurf());
-  app.use(compression());
-
-  const port = configService.get<string>('PORT');
-
   app.use(cookieParser());
-
-  app.useGlobalPipes(new ValidationPipe({ }));
-
   app.use(
     session({
       secret: configService.get('SESSION_SECRET', 'nest-first'),
@@ -38,6 +29,15 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+  app.enableCors();
+  app.use(csurf());
+  app.use(compression());
+
+  const port = configService.get<string>('PORT');
+
+
+  app.useGlobalPipes(new ValidationPipe({ }));
+
 
   await app.listen(port || 3001);
 }
