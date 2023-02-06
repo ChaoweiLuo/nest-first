@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config/dist';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
@@ -7,10 +7,12 @@ import * as session from 'express-session';
 import { ValidationPipe } from '@nestjs/common';
 import * as csurf from 'csurf';
 import * as compression from 'compression';
+import { AuthenticationGuard, AuthorizationGuard } from './user.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const reflector = app.get(Reflector);
 
   const config = new DocumentBuilder()
     .setTitle('Book example')
@@ -35,9 +37,9 @@ async function bootstrap() {
 
   const port = configService.get<string>('PORT');
 
-
-  app.useGlobalPipes(new ValidationPipe({ }));
-
+  app.useGlobalPipes(new ValidationPipe({}));
+  app.useGlobalGuards(new AuthenticationGuard(configService));
+  app.useGlobalGuards(new AuthorizationGuard(reflector));
 
   await app.listen(port || 3001);
 }

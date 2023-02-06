@@ -12,8 +12,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule/dist';
 import { MulterModule } from '@nestjs/platform-express/multer';
 import { FileController } from './file.controller';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthorizationGuard } from './user.dto';
 import { AuthController } from './auth.controller';
 
 @Module({
@@ -50,6 +48,6 @@ import { AuthController } from './auth.controller';
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController, BookController, FileController, AuthController],
-  providers: [AppService, BookService, RedisService, { provide: APP_GUARD, useClass: AuthorizationGuard }],
+  providers: [AppService, BookService, RedisService],
 })
 export class AppModule {}

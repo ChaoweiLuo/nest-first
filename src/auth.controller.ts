@@ -3,9 +3,6 @@ import { hash, LoginDto, users } from "./user.dto";
 import jwt from 'jsonwebtoken';
 import { ConfigService } from "@nestjs/config";
 
-
-
-
 @Controller('auth')
 export class AuthController {
 
@@ -28,7 +25,7 @@ export class AuthController {
     return 'all';
   }
 
-  @SetMetadata('role', 'admin')
+  @SetMetadata('role', ['admin'])
   @Get("admin")
   onlyAdmin() {
     return "admin";
