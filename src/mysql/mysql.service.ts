@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { CronExpression } from '@nestjs/schedule/dist';
 import { InjectRepository } from '@nestjs/typeorm';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Repository } from 'typeorm';
 import { CreateMysqlDto } from './dto/create-mysql.dto';
 import { UpdateMysqlDto } from './dto/update-mysql.dto';
@@ -12,11 +13,14 @@ export class MysqlService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   sqlJob() {
-    console.log('sqlJob Running.', new Date());
+    this.logger.log('hello logger')
+    this.logger.error('sqlJob Running.');
   }
 
   create(createMysqlDto: CreateMysqlDto) {

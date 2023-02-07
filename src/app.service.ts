@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RedisService } from './redis.service';
 
 @Injectable()
@@ -8,11 +9,12 @@ export class AppService {
   constructor(
     private readonly configService: ConfigService,
     private readonly redisService: RedisService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) {}
 
   @Cron(CronExpression.EVERY_5_SECONDS)
   appJob() {
-    console.log('appJob Running.', new Date());
+    this.logger.log('appJob Running.', new Date());
   }
 
   getHello(): string {

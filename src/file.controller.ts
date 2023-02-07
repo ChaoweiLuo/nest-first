@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, LoggerService, Query } from '@nestjs/common';
 import {
   Body,
+  Inject,
   Post,
   Res,
   UploadedFile,
@@ -22,10 +23,15 @@ import {
 import { Response } from 'express';
 import { createReadStream } from 'fs';
 import { readFile } from 'fs/promises';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { join } from 'path';
 
-@Controller("file")
+@Controller('file')
 export class FileController {
+  constructor(
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
+  ) {}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -40,7 +46,7 @@ export class FileController {
     )
     file: Express.Multer.File,
   ) {
-    console.log('file', file);
+    this.logger.log('file', file);
   }
 
   @Post('uploads')
@@ -57,33 +63,32 @@ export class FileController {
       file?: Express.Multer.File[];
     },
   ) {
-    console.log(files);
+    this.logger.log(files);
   }
 
   @Post('uploadarray')
   @UseInterceptors(FilesInterceptor('files'))
   uploadFileArray(@UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log(files);
+    this.logger.log(files);
   }
 
   @Post('uploadany')
   @UseInterceptors(AnyFilesInterceptor())
   uploadAnyFile(@UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log(files);
+    this.logger.log(files);
   }
 
-  @Get("download")
-  @Header("content-type", "html/text")
+  @Get('download')
+  @Header('content-type', 'html/text')
   async download() {
     const content = await readFile(__filename);
     return content.toString();
   }
 
-  @Get("pipe")
-  @Header("content-type", "html/text")
+  @Get('pipe')
+  @Header('content-type', 'html/text')
   pipe(@Res() res: Response) {
     const reader = createReadStream(__filename);
     reader.pipe(res);
   }
-
 }

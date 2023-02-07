@@ -13,15 +13,38 @@ import { ScheduleModule } from '@nestjs/schedule/dist';
 import { MulterModule } from '@nestjs/platform-express/multer';
 import { FileController } from './file.controller';
 import { AuthController } from './auth.controller';
+import { utilities, WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    WinstonModule.forRootAsync({
+      // options
+      inject: [ConfigService],
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        level: 'info',
+        transports: [
+          new winston.transports.File({
+            filename: 'error.log',
+            level: 'error',
+          }),
+          new winston.transports.Console({
+            format: winston.format.combine(
+              winston.format.timestamp(),
+              winston.format.ms(),
+              utilities.format.nestLike('best-first', {}),
+            ),
+          }),
+        ],
+      }),
+    }),
     MulterModule.registerAsync({
       inject: [ConfigService],
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        dest: configService.get("FILE_DEST")
+        dest: configService.get('FILE_DEST'),
       }),
     }),
     MongooseModule.forRootAsync({

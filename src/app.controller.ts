@@ -1,25 +1,37 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { Body, Post, Req, Res, Session } from '@nestjs/common/decorators';
+import { Controller, Get, LoggerService, Query } from '@nestjs/common';
+import {
+  Body,
+  Inject,
+  Post,
+  Req,
+  Res,
+  Session,
+} from '@nestjs/common/decorators';
 import { ParseIntPipe } from '@nestjs/common/pipes';
 import { Request, Response } from 'express';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
+  ) {}
 
   @Get()
   getHello(@Req() req: Request): string {
-    console.log('cookies', req.cookies);
+    this.logger.log('cookies', req.cookies);
     return this.appService.getHello();
   }
 
-  @Get("cookie")
+  @Get('cookie')
   getCookie(@Req() req: Request) {
     return req.cookies;
   }
 
-  @Post("cookie")
+  @Post('cookie')
   setCookie(
     @Body('key') key: string,
     @Body('value') value: string,
@@ -33,7 +45,6 @@ export class AppController {
     session.visits = session.visits ? session.visits + 1 : 1;
     return session;
   }
-
 
   @Get('first-api')
   firstApi() {
