@@ -9,6 +9,7 @@ import * as csurf from 'csurf';
 import * as compression from 'compression';
 import { AuthenticationGuard, AuthorizationGuard } from './user.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import * as helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: ['error', 'warn'] });
@@ -37,6 +38,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(csurf());
   app.use(compression());
+  app.use(helmet);
 
   const port = configService.get<string>('PORT');
 
