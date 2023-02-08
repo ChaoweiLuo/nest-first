@@ -9,10 +9,11 @@ import * as csurf from 'csurf';
 import * as compression from 'compression';
 import { AuthenticationGuard, AuthorizationGuard } from './user.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import * as helmet from 'helmet';
-
+import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
+import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { logger: ['error', 'warn'] });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger: ['error', 'warn'] });
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
 
@@ -27,6 +28,12 @@ async function bootstrap() {
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
+  app.use(rateLimit({
+    windowMs: 1000 * 60 * 10,
+    max: 300
+  }));
+  app.set('trust proxy', true);
+
   app.use(cookieParser());
   app.use(
     session({
@@ -38,7 +45,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(csurf());
   app.use(compression());
-  app.use(helmet);
+  app.use(helmet());
 
   const port = configService.get<string>('PORT');
 
