@@ -1,4 +1,4 @@
-import { Inject, Injectable, Module } from '@nestjs/common';
+import { DynamicModule, Global, Inject, Injectable, Module } from '@nestjs/common';
 import { BookService } from './book/book.service';
 
 const app = { name: 'Nest-first-instance1', createdAt: '2023-02-07' };
@@ -45,4 +45,17 @@ class TestService {}
     },
   ],
 })
-export class TestModule {}
+export class TestModule {
+  static registe = (name: string, global: boolean = false): DynamicModule => {
+    const testName = { provide: TEST_MODULE_NAME, useValue: name || 'TestModule' };
+    return {
+      global,
+      module: TestModule,
+      providers: [testName],
+      exports: [testName]
+    }
+  }
+}
+
+export const TEST_MODULE_NAME = Symbol('TEST_MODULE_NAME');
+
